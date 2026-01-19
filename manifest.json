@@ -1,0 +1,10 @@
+{
+  "manifest_version": 3,
+  "name": "Meeting Cost Calculator",
+  "version": "1.0.0",
+  "description": "Calculate the cost of meetings based on participant salaries and duration",
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "permissions": []
+}

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Meeting Cost Calculator</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Meeting Cost Calculator</h1>
+    
+    <form id="calculatorForm">
+      <div class="form-group">
+        <label for="meetingName">Meeting Name</label>
+        <input type="text" id="meetingName" name="meetingName" placeholder="Enter meeting name (optional)">
+      </div>
+      
+      <div class="form-group">
+        <label for="duration">Meeting Duration (minutes)</label>
+        <input type="number" id="duration" name="duration" min="0" step="1" value="30" required>
+      </div>
+      
+      <div class="attendees-section">
+        <div class="section-header">
+          <h2>Attendees</h2>
+        </div>
+        
+        <div class="preset-roles">
+          <p class="preset-label">Quick Add:</p>
+          <div class="preset-buttons">
+            <button type="button" class="preset-btn" data-role="Engineer" data-rate="100">Engineer</button>
+            <button type="button" class="preset-btn" data-role="PM" data-rate="120">PM</button>
+            <button type="button" class="preset-btn" data-role="Designer" data-rate="90">Designer</button>
+            <button type="button" class="preset-btn" data-role="Executive" data-rate="200">Executive</button>
+          </div>
+        </div>
+        
+        <div class="add-attendee-section">
+          <button type="button" id="addAttendeeBtn" class="btn-add">+ Add Custom Attendee</button>
+        </div>
+        
+        <div id="attendeesList" class="attendees-list">
+          <!-- Attendees will be added here dynamically -->
+        </div>
+      </div>
+    </form>
+    
+    <div id="result" class="result">
+      <h2>Meeting Cost</h2>
+      <div class="cost-display">
+        <span class="cost-amount" id="costAmount">$0.00</span>
+      </div>
+      <div class="cost-breakdown">
+        <p><span>Total hourly rate:</span> <span id="totalHourlyRate">$0.00</span></p>
+        <p><span>Cost per minute:</span> <span id="costPerMinute">$0.00</span></p>
+      </div>
+      <div class="copy-section">
+        <button type="button" id="copySummaryBtn" class="btn-copy">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M5.5 4.5V2.5C5.5 1.67 6.17 1 7 1H13.5C14.33 1 15 1.67 15 2.5V9.5C15 10.33 14.33 11 13.5 11H11.5V13.5C11.5 14.33 10.83 15 10 15H2.5C1.67 15 1 14.33 1 13.5V5.5C1 4.67 1.67 4 2.5 4H5.5V4.5Z" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Copy Summary
+        </button>
+        <div id="copySuccessMessage" class="copy-success hidden">✓ Copied to clipboard!</div>
+      </div>
+    </div>
+  </div>
+  
+  <script src="popup.js"></script>
+</body>
+</html>
