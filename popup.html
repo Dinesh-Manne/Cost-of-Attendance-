@@ -26,13 +26,16 @@
           <h2>Attendees</h2>
         </div>
         
-        <div class="preset-roles">
-          <p class="preset-label">Quick Add:</p>
-          <div class="preset-buttons">
-            <button type="button" class="preset-btn" data-role="Engineer" data-rate="100">Engineer</button>
-            <button type="button" class="preset-btn" data-role="PM" data-rate="120">PM</button>
-            <button type="button" class="preset-btn" data-role="Designer" data-rate="90">Designer</button>
-            <button type="button" class="preset-btn" data-role="Executive" data-rate="200">Executive</button>
+        <div class="employee-directory">
+          <div class="directory-header">
+            <p class="preset-label">Select from Directory:</p>
+            <a href="settings.html" target="_blank" class="btn-settings" title="Manage Employees">⚙️</a>
+          </div>
+          <div id="employeeCheckboxes" class="employee-checkboxes">
+            <!-- Employee checkboxes will be dynamically populated -->
+          </div>
+          <div id="noEmployeesMessage" class="no-employees-message">
+            No employees in directory. <a href="settings.html" target="_blank">Add employees</a>
           </div>
         </div>
         

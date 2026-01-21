@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Custom Icon Converter</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #0F172A;
+      color: #f1f5f9;
+      padding: 40px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    .subtitle {
+      text-align: center;
+      color: #64748b;
+      margin-bottom: 40px;
+    }
+    .upload-area {
+      background: #1e293b;
+      border: 3px dashed #3b82f6;
+      border-radius: 12px;
+      padding: 60px 40px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-bottom: 30px;
+    }
+    .upload-area:hover {
+      border-color: #60a5fa;
+      background: #2d3b52;
+    }
+    .upload-area.dragover {
+      border-color: #10b981;
+      background: #2d3b52;
+    }
+    input[type="file"] {
+      display: none;
+    }
+    .upload-icon {
+      font-size: 48px;
+      margin-bottom: 20px;
+    }
+    .preview-container {
+      display: none;
+      gap: 20px;
+      justify-content: center;
+      margin: 40px 0;
+      flex-wrap: wrap;
+    }
+    .preview-container.show {
+      display: flex;
+    }
+    .preview-item {
+      background: #1e293b;
+      padding: 20px;
+      border-radius: 12px;
+      border: 2px solid #3b82f6;
+      text-align: center;
+    }
+    .preview-item h3 {
+      margin: 15px 0 5px;
+      font-size: 14px;
+      color: #64748b;
+    }
+    canvas {
+      border: 2px solid #3b82f6;
+      border-radius: 8px;
+      background: white;
+      image-rendering: -webkit-optimize-contrast;
+      image-rendering: crisp-edges;
+    }
+    .btn {
+      background: #3b82f6;
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-block;
+      margin: 10px;
+      transition: all 0.2s ease;
+    }
+    .btn:hover {
+      background: #2563eb;
+      transform: translateY(-1px);
+    }
+    .btn:disabled {
+      background: #475569;
+      cursor: not-allowed;
+      transform: none;
+    }
+    .success {
+      background: #10b981;
+      padding: 20px;
+      border-radius: 8px;
+      margin: 20px 0;
+      text-align: center;
+      display: none;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+    .success.show {
+      display: block;
+    }
+    .actions {
+      text-align: center;
+    }
+    .original-preview {
+      max-width: 200px;
+      max-height: 200px;
+      margin: 20px auto;
+      display: none;
+    }
+    .original-preview.show {
+      display: block;
+    }
+    .original-preview img {
+      max-width: 100%;
+      border-radius: 8px;
+      border: 2px solid #3b82f6;
+    }
+  </style>
+</head>
+<body>
+  <h1>💰 Custom Icon Converter</h1>
+  <p class="subtitle">Upload your icon image and we'll generate all required sizes</p>
+  
+  <div class="upload-area" id="uploadArea">
+    <div class="upload-icon">📁</div>
+    <h2>Click to upload or drag & drop</h2>
+    <p>PNG, JPG, SVG supported</p>
+    <input type="file" id="fileInput" accept="image/*">
+  </div>
+
+  <div class="original-preview" id="originalPreview">
+    <h3 style="color: #64748b; text-align: center; margin-bottom: 10px;">Original Image:</h3>
+    <img id="originalImage" src="">
+  </div>
+
+  <div class="preview-container" id="previewContainer">
+    <div class="preview-item">
+      <canvas id="canvas16" width="16" height="16"></canvas>
+      <h3>icon16.png</h3>
+      <p style="font-size: 12px; color: #64748b;">16×16 pixels</p>
+    </div>
+    <div class="preview-item">
+      <canvas id="canvas48" width="48" height="48"></canvas>
+      <h3>icon48.png</h3>
+      <p style="font-size: 12px; color: #64748b;">48×48 pixels</p>
+    </div>
+    <div class="preview-item">
+      <canvas id="canvas128" width="128" height="128"></canvas>
+      <h3>icon128.png</h3>
+      <p style="font-size: 12px; color: #64748b;">128×128 pixels</p>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button class="btn" id="downloadBtn" onclick="downloadAll()" disabled>📥 Download All Icons</button>
+    <button class="btn" onclick="reset()">🔄 Upload Different Image</button>
+  </div>
+  
+  <div class="success" id="success">
+    ✅ <strong>Icons downloaded successfully!</strong><br><br>
+    <strong>Next steps:</strong><br>
+    1. Move the 3 PNG files to: /Users/dineshmanne/Documents/COA /<br>
+    2. Go to chrome://extensions/<br>
+    3. Click the reload icon (🔄) for "Meeting Cost Calculator"<br>
+    4. Your new icon will appear!
+  </div>
+
+  <script>
+    const uploadArea = document.getElementById('uploadArea');
+    const fileInput = document.getElementById('fileInput');
+    const previewContainer = document.getElementById('previewContainer');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const originalPreview = document.getElementById('originalPreview');
+    const originalImage = document.getElementById('originalImage');
+    const successMsg = document.getElementById('success');
+
+    let uploadedImage = null;
+
+    // Click to upload
+    uploadArea.addEventListener('click', () => fileInput.click());
+
+    // Drag and drop
+    uploadArea.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      uploadArea.classList.add('dragover');
+    });
+
+    uploadArea.addEventListener('dragleave', () => {
+      uploadArea.classList.remove('dragover');
+    });
+
+    uploadArea.addEventListener('drop', (e) => {
+      e.preventDefault();
+      uploadArea.classList.remove('dragover');
+      const file = e.dataTransfer.files[0];
+      if (file && file.type.startsWith('image/')) {
+        handleImage(file);
+      }
+    });
+
+    // File input change
+    fileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        handleImage(file);
+      }
+    });
+
+    function handleImage(file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          uploadedImage = img;
+          originalImage.src = e.target.result;
+          originalPreview.classList.add('show');
+          generateIcons(img);
+          previewContainer.classList.add('show');
+          downloadBtn.disabled = false;
+          uploadArea.style.display = 'none';
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function generateIcons(img) {
+      drawIcon(document.getElementById('canvas16'), img, 16);
+      drawIcon(document.getElementById('canvas48'), img, 48);
+      drawIcon(document.getElementById('canvas128'), img, 128);
+    }
+
+    function drawIcon(canvas, img, size) {
+      const ctx = canvas.getContext('2d');
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+      
+      // Clear canvas
+      ctx.clearRect(0, 0, size, size);
+      
+      // Calculate scaling to fit and center
+      const scale = Math.min(size / img.width, size / img.height);
+      const x = (size - img.width * scale) / 2;
+      const y = (size - img.height * scale) / 2;
+      
+      // Draw image
+      ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
+    }
+
+    function downloadCanvas(canvas, filename) {
+      return new Promise((resolve) => {
+        canvas.toBlob((blob) => {
+          const link = document.createElement('a');
+          link.download = filename;
+          link.href = URL.createObjectURL(blob);
+          link.click();
+          setTimeout(() => {
+            URL.revokeObjectURL(link.href);
+            resolve();
+          }, 100);
+        }, 'image/png');
+      });
+    }
+
+    async function downloadAll() {
+      downloadBtn.disabled = true;
+      downloadBtn.textContent = '⏳ Downloading...';
+      
+      await downloadCanvas(document.getElementById('canvas16'), 'icon16.png');
+      await new Promise(resolve => setTimeout(resolve, 200));
+      await downloadCanvas(document.getElementById('canvas48'), 'icon48.png');
+      await new Promise(resolve => setTimeout(resolve, 200));
+      await downloadCanvas(document.getElementById('canvas128'), 'icon128.png');
+      
+      downloadBtn.textContent = '✅ Downloaded!';
+      successMsg.classList.add('show');
+      
+      setTimeout(() => {
+        downloadBtn.textContent = '📥 Download All Icons';
+        downloadBtn.disabled = false;
+      }, 2000);
+    }
+
+    function reset() {
+      uploadedImage = null;
+      fileInput.value = '';
+      uploadArea.style.display = 'block';
+      previewContainer.classList.remove('show');
+      originalPreview.classList.remove('show');
+      successMsg.classList.remove('show');
+      downloadBtn.disabled = true;
+    }
+  </script>
+</body>
+</html>

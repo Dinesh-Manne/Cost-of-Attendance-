@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Employee Directory - Meeting Cost Calculator</title>
+  <link rel="stylesheet" href="settings.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Employee Directory</h1>
+      <p class="subtitle">Manage your team members and their hourly rates</p>
+    </header>
+
+    <div class="main-content">
+      <!-- Add Employee Form -->
+      <section class="form-section">
+        <h2 id="formTitle">Add New Employee</h2>
+        <form id="employeeForm">
+          <div class="form-row">
+            <div class="form-field">
+              <label for="employeeName">Name *</label>
+              <input 
+                type="text" 
+                id="employeeName" 
+                name="name" 
+                placeholder="e.g., John Doe" 
+                required
+              >
+            </div>
+            <div class="form-field">
+              <label for="employeeRole">Role *</label>
+              <input 
+                type="text" 
+                id="employeeRole" 
+                name="role" 
+                placeholder="e.g., Senior Engineer" 
+                required
+              >
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-field">
+              <label for="employeeRate">Hourly Rate ($) *</label>
+              <input 
+                type="number" 
+                id="employeeRate" 
+                name="hourlyRate" 
+                placeholder="e.g., 100" 
+                min="0" 
+                step="0.01" 
+                required
+              >
+            </div>
+            <div class="form-field form-actions">
+              <button type="submit" class="btn-primary" id="submitBtn">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                Add Employee
+              </button>
+              <button type="button" class="btn-secondary" id="cancelBtn" style="display: none;">Cancel</button>
+            </div>
+          </div>
+        </form>
+      </section>
+
+      <!-- Search and Filter -->
+      <section class="search-section">
+        <div class="search-bar">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="2"/>
+            <path d="M12.5 12.5L17 17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <input 
+            type="text" 
+            id="searchInput" 
+            placeholder="Search employees by name or role..."
+          >
+        </div>
+        <div class="actions">
+          <button class="btn-outline" id="exportBtn">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M8 2v8M5 7l3 3 3-3M2 12v2h12v-2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Export
+          </button>
+          <button class="btn-outline" id="importBtn">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M8 10V2M5 5l3-3 3 3M2 12v2h12v-2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Import
+          </button>
+          <input type="file" id="importFile" accept=".csv" style="display: none;">
+        </div>
+      </section>
+
+      <!-- Employee List -->
+      <section class="employee-list-section">
+        <div class="section-header">
+          <h2>Your Employees</h2>
+          <span id="employeeCount" class="count-badge">0 employees</span>
+        </div>
+        
+        <div id="employeeList" class="employee-list">
+          <!-- Employee cards will be dynamically added here -->
+        </div>
+
+        <div id="emptyState" class="empty-state">
+          <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="32" cy="24" r="8" stroke="currentColor" stroke-width="2"/>
+            <path d="M16 48c0-8.837 7.163-16 16-16s16 7.163 16 16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <h3>No employees yet</h3>
+          <p>Add your first employee using the form above</p>
+        </div>
+      </section>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+      <a href="#" id="backToCalculator" class="btn-link">← Back to Calculator</a>
+      <p class="footer-text">All data is stored locally in your browser</p>
+    </footer>
+
+    <!-- Success Toast -->
+    <div id="toast" class="toast hidden"></div>
+  </div>
+
+  <script src="settings.js"></script>
+</body>
+</html>

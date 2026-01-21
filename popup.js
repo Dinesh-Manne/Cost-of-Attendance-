@@ -7,20 +7,22 @@ document.addEventListener('DOMContentLoaded', function() {
   const costAmount = document.getElementById('costAmount');
   const totalHourlyRate = document.getElementById('totalHourlyRate');
   const costPerMinute = document.getElementById('costPerMinute');
-  const presetButtons = document.querySelectorAll('.preset-btn');
   const copySummaryBtn = document.getElementById('copySummaryBtn');
   const copySuccessMessage = document.getElementById('copySuccessMessage');
+  const employeeCheckboxes = document.getElementById('employeeCheckboxes');
+  const noEmployeesMessage = document.getElementById('noEmployeesMessage');
   
   let attendeeCount = 0;
+  let employees = [];
+  const selectedEmployeeIds = new Set();
   
-  // Preset role button handlers
-  presetButtons.forEach(btn => {
-    btn.addEventListener('click', function() {
-      const role = this.dataset.role;
-      const rate = parseFloat(this.dataset.rate);
-      addAttendee(role, rate);
-    });
-  });
+  // Load employee directory from storage
+  loadEmployeeDirectory();
+  
+  // Listen for employee checkbox changes
+  if (employeeCheckboxes) {
+    employeeCheckboxes.addEventListener('change', handleEmployeeCheckboxChange);
+  }
   
   // Add custom attendee button click handler
   addAttendeeBtn.addEventListener('click', function() {
@@ -52,11 +54,14 @@ document.addEventListener('DOMContentLoaded', function() {
     copySummary();
   });
   
-  function addAttendee(name = '', rate = '') {
+  function addAttendee(name = '', rate = '', employeeId = null) {
     attendeeCount++;
     const attendeeItem = document.createElement('div');
     attendeeItem.className = 'attendee-item';
     attendeeItem.dataset.id = attendeeCount;
+    if (employeeId) {
+      attendeeItem.dataset.employeeId = employeeId;
+    }
     
     attendeeItem.innerHTML = `
       <div class="attendee-info">
@@ -135,6 +140,16 @@ document.addEventListener('DOMContentLoaded', function() {
   
   function removeAttendee(attendeeItem) {
     if (attendeeItem) {
+      // Uncheck corresponding employee checkbox if this was from directory
+      const employeeId = attendeeItem.dataset.employeeId;
+      if (employeeId) {
+        selectedEmployeeIds.delete(employeeId);
+        const checkbox = employeeCheckboxes.querySelector(`[data-id="${employeeId}"]`);
+        if (checkbox) {
+          checkbox.checked = false;
+        }
+      }
+      
       attendeeItem.style.opacity = '0';
       attendeeItem.style.transform = 'translateX(-10px)';
       setTimeout(() => {
@@ -310,6 +325,105 @@ document.addEventListener('DOMContentLoaded', function() {
       }
       document.body.removeChild(textArea);
     }
+  }
+  
+  // Load employee directory from storage
+  async function loadEmployeeDirectory() {
+    try {
+      const result = await chrome.storage.local.get('employees');
+      employees = result.employees || [];
+      renderEmployeeCheckboxes();
+    } catch (error) {
+      console.error('Error loading employees:', error);
+      employees = [];
+      renderEmployeeCheckboxes();
+    }
+  }
+  
+  // Render employee checkboxes
+  function renderEmployeeCheckboxes() {
+    if (!employeeCheckboxes) return;
+    
+    employeeCheckboxes.innerHTML = '';
+    
+    if (employees.length === 0) {
+      noEmployeesMessage.style.display = 'block';
+      employeeCheckboxes.style.display = 'none';
+      return;
+    }
+    
+    noEmployeesMessage.style.display = 'none';
+    employeeCheckboxes.style.display = 'grid';
+    
+    employees.forEach(employee => {
+      const checkboxItem = document.createElement('label');
+      checkboxItem.className = 'employee-checkbox-item';
+      
+      checkboxItem.innerHTML = `
+        <input 
+          type="checkbox" 
+          class="employee-checkbox" 
+          data-id="${employee.id}"
+          data-name="${escapeAttr(employee.name)}"
+          data-role="${escapeAttr(employee.role)}"
+          data-rate="${employee.hourlyRate}"
+        >
+        <div class="employee-checkbox-info">
+          <span class="employee-checkbox-name">${escapeHtml(employee.name)}</span>
+          <span class="employee-checkbox-rate">$${employee.hourlyRate}/hr</span>
+        </div>
+      `;
+      
+      employeeCheckboxes.appendChild(checkboxItem);
+    });
+  }
+  
+  // Handle employee checkbox change
+  function handleEmployeeCheckboxChange(e) {
+    if (!e.target.classList.contains('employee-checkbox')) return;
+    
+    const checkbox = e.target;
+    const employeeId = checkbox.dataset.id;
+    const name = checkbox.dataset.name;
+    const rate = parseFloat(checkbox.dataset.rate);
+    
+    if (checkbox.checked) {
+      // Add employee to selected set
+      selectedEmployeeIds.add(employeeId);
+      // Add to meeting
+      addEmployeeToMeeting(name, rate, employeeId);
+    } else {
+      // Remove employee from selected set
+      selectedEmployeeIds.delete(employeeId);
+      // Remove from meeting
+      removeEmployeeFromMeeting(employeeId);
+    }
+  }
+  
+  // Add employee to meeting attendees
+  function addEmployeeToMeeting(name, rate, employeeId) {
+    addAttendee(name, rate, employeeId);
+  }
+  
+  // Remove employee from meeting attendees
+  function removeEmployeeFromMeeting(employeeId) {
+    const attendeeItem = attendeesList.querySelector(`[data-employee-id="${employeeId}"]`);
+    if (attendeeItem) {
+      attendeeItem.remove();
+      calculateCost();
+    }
+  }
+  
+  // Escape HTML for security
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+  
+  // Escape attribute for security
+  function escapeAttr(text) {
+    return text.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
   }
   
   // Initial calculation
