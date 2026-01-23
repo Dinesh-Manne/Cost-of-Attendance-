@@ -511,15 +511,19 @@ button:active {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   background: var(--bg-primary);
   border: 2px solid var(--border-color);
-  border-radius: 6px;
+  border-radius: 8px;
   color: var(--text-secondary);
   text-decoration: none;
   font-size: 16px;
   transition: all 0.2s ease;
+}
+
+.btn-settings svg {
+  transition: transform 0.3s ease;
 }
 
 .btn-settings:hover {
@@ -528,6 +532,10 @@ button:active {
   color: white;
   transform: translateY(-1px);
   box-shadow: var(--shadow-sm);
+}
+
+.btn-settings:hover svg {
+  transform: rotate(90deg);
 }
 
 .employee-checkboxes {
