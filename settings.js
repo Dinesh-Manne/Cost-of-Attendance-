@@ -170,6 +170,16 @@ async function deleteEmployee(id) {
     return;
   }
   
+  // Animate card removal
+  const card = document.querySelector(`[data-id="${id}"]`);
+  if (card) {
+    card.style.opacity = '0';
+    card.style.transform = 'translateX(-20px) scale(0.95)';
+    card.style.transition = 'all 250ms cubic-bezier(0.4, 0, 0.2, 1)';
+    
+    await new Promise(resolve => setTimeout(resolve, 250));
+  }
+  
   employees = employees.filter(emp => emp.id !== id);
   
   if (await saveEmployees()) {
@@ -218,9 +228,19 @@ function renderEmployees(employeesToRender) {
   
   emptyState.style.display = 'none';
   
-  employeesToRender.forEach(employee => {
+  employeesToRender.forEach((employee, index) => {
     const card = createEmployeeCard(employee);
+    // Stagger animation for each card
+    card.style.opacity = '0';
+    card.style.transform = 'translateY(10px)';
     employeeList.appendChild(card);
+    
+    // Trigger animation with stagger delay
+    setTimeout(() => {
+      card.style.transition = 'all 350ms cubic-bezier(0.4, 0, 0.2, 1)';
+      card.style.opacity = '1';
+      card.style.transform = 'translateY(0)';
+    }, index * 50); // 50ms stagger between cards
   });
 }
 
@@ -295,10 +315,21 @@ function handleSearch(e) {
   renderEmployees(filtered);
 }
 
-// Update employee count
+// Update employee count with animation
 function updateCount() {
   const count = employees.length;
-  employeeCount.textContent = `${count} employee${count !== 1 ? 's' : ''}`;
+  const newText = `${count} employee${count !== 1 ? 's' : ''}`;
+  
+  // Animate the count change
+  if (employeeCount.textContent !== newText) {
+    employeeCount.style.transform = 'scale(1.15)';
+    employeeCount.style.transition = 'transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1)';
+    
+    setTimeout(() => {
+      employeeCount.textContent = newText;
+      employeeCount.style.transform = 'scale(1)';
+    }, 100);
+  }
 }
 
 // Export employees to CSV (Excel-compatible)

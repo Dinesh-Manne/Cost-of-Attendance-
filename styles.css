@@ -72,7 +72,7 @@
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', system-ui, 'Helvetica Neue', Arial, sans-serif;
-  background: transparent;
+  background: var(--bg-primary);
   padding: 0;
   width: 450px;
   max-width: 800px;

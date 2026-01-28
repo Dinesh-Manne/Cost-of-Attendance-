@@ -159,6 +159,11 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
   
+  // Store previous values for smooth animation
+  let prevTotalCost = 0;
+  let prevTotalRate = 0;
+  let prevCostPerMin = 0;
+  
   function calculateCost() {
     // Get all attendees
     const attendeeItems = attendeesList.querySelectorAll('.attendee-item');
@@ -184,17 +189,25 @@ document.addEventListener('DOMContentLoaded', function() {
     // Handle edge cases
     if (duration <= 0) {
       // If duration is 0 or invalid, show hourly rate only
-      costAmount.textContent = formatCurrency(0);
-      totalHourlyRate.textContent = formatCurrency(totalRate);
-      costPerMinute.textContent = formatCurrency(totalRate / 60);
+      animateValue(costAmount, prevTotalCost, 0, 600);
+      animateValue(totalHourlyRate, prevTotalRate, totalRate, 600);
+      animateValue(costPerMinute, prevCostPerMin, totalRate / 60, 600);
+      
+      prevTotalCost = 0;
+      prevTotalRate = totalRate;
+      prevCostPerMin = totalRate / 60;
       return;
     }
     
     if (validAttendees === 0) {
       // No valid attendees
-      costAmount.textContent = formatCurrency(0);
-      totalHourlyRate.textContent = formatCurrency(0);
-      costPerMinute.textContent = formatCurrency(0);
+      animateValue(costAmount, prevTotalCost, 0, 600);
+      animateValue(totalHourlyRate, prevTotalRate, 0, 600);
+      animateValue(costPerMinute, prevCostPerMin, 0, 600);
+      
+      prevTotalCost = 0;
+      prevTotalRate = 0;
+      prevCostPerMin = 0;
       return;
     }
     
@@ -203,10 +216,43 @@ document.addEventListener('DOMContentLoaded', function() {
     const totalCost = totalRate * durationInHours;
     const costPerMin = totalRate / 60;
     
-    // Display results
-    costAmount.textContent = formatCurrency(totalCost);
-    totalHourlyRate.textContent = formatCurrency(totalRate);
-    costPerMinute.textContent = formatCurrency(costPerMin);
+    // Animate results with smooth transitions
+    animateValue(costAmount, prevTotalCost, totalCost, 600);
+    animateValue(totalHourlyRate, prevTotalRate, totalRate, 600);
+    animateValue(costPerMinute, prevCostPerMin, costPerMin, 600);
+    
+    // Update previous values
+    prevTotalCost = totalCost;
+    prevTotalRate = totalRate;
+    prevCostPerMin = costPerMin;
+  }
+  
+  // Animate number changes smoothly
+  function animateValue(element, start, end, duration) {
+    // Cancel any existing animation on this element
+    if (element.animationFrame) {
+      cancelAnimationFrame(element.animationFrame);
+    }
+    
+    const startTime = performance.now();
+    const range = end - start;
+    
+    function update(currentTime) {
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      
+      // Easing function (ease-out cubic)
+      const easeProgress = 1 - Math.pow(1 - progress, 3);
+      
+      const current = start + (range * easeProgress);
+      element.textContent = formatCurrency(current);
+      
+      if (progress < 1) {
+        element.animationFrame = requestAnimationFrame(update);
+      }
+    }
+    
+    element.animationFrame = requestAnimationFrame(update);
   }
   
   function formatCurrency(amount) {
