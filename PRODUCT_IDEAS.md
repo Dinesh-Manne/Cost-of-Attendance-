@@ -65,6 +65,34 @@ Companies waste money on unnecessary meetings, but have no visibility into the a
 
 **Why it matters**: Identify systematic waste, justify optimization
 
+#### More detail: what the dashboard actually does
+
+| Metric | What it means | Example |
+|--------|----------------|---------|
+| **Total spent** | Sum of (duration × sum of attendee rates) for all meetings in the period | "This week: $12,400 • This month: $48,200 • This quarter: $142,100" |
+| **Most expensive meetings** | List sorted by cost; highlights recurring series | "Weekly All-Hands: $4,200 each → $218K/year" |
+| **Cost by department/project** | Breakdown when attendees have roles/departments; needs org structure or tags | "Engineering: 45% • Product: 30% • Sales: 25%" |
+| **Average cost per meeting type** | Group by template or category (standup, 1:1, planning, etc.) | "Standups: $180 avg • Planning: $1,200 avg" |
+| **Trends over time** | Line or bar chart: total cost (and optionally meeting count) per week/month | "Up 15% vs last month" or "Down after we cut 3 recurring meetings" |
+
+**Who uses it**
+- **Individuals**: "How much did my meetings cost this month?"
+- **Managers**: "How much is my team spending? Which meetings are the biggest levers?"
+- **Executives**: "What’s our org-wide meeting spend? Is it going up or down?"
+
+**Data you need**
+- **Per meeting**: name, date, duration, list of attendees (and their rates at that time), optional category/template.
+- **Stored over time** so you can aggregate by week, month, quarter and filter by person, team, or type.
+
+**Export reports**
+- **CSV**: Raw list of meetings with cost, date, attendees, so execs can pivot in Excel/Sheets.
+- **PDF one-pager**: Summary totals, top 5 most expensive meetings, and a simple trend (e.g. this month vs last month). Good for leadership updates.
+
+**Implementation phases**
+1. **V1 – Personal history**: Every time the user calculates a meeting in the popup, save it (name, duration, attendees, total cost, date). Show a simple "History" tab: table of past meetings and a weekly/monthly total.
+2. **V2 – Charts and filters**: Add time-range filters (week/month/quarter) and a trend chart (e.g. cost per week). Add "most expensive" list (single meetings and, if you have recurrence info, series).
+3. **V3 – Teams and export**: If you have department/role or project metadata, add cost-by-department (or by project). Add CSV and PDF export so managers can share with leadership.
+
 ---
 
 ### 5. **Smart Recommendations** 🤖
